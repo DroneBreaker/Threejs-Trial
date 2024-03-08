@@ -3,6 +3,10 @@ import "./style.css"
 import gsap from 'gsap';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'lil-gui'
+import { color } from 'dat.gui';
+import typeFaceFont from 'three/examples/fonts/helvetiker_regular.typeface.json';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
 
 // Scene
 const scene = new THREE.Scene();
@@ -13,7 +17,7 @@ const scene = new THREE.Scene();
     Debug
 */ 
 const gui = new dat.GUI({ width: 400 });
-gui.hide()
+
 
 const parameters = {
     color: 0xff0000,
@@ -23,6 +27,7 @@ gui.addColor(parameters, 'color')
     .onChange(() => {
         material.color.set(parameters.color)
 })
+// gui.add(material, 'displacementScale').min(0).max(1).step(0.0001)
 
 const cursor = {
     x: 0,
@@ -97,6 +102,53 @@ window.addEventListener('mousemove', (event) => {
 // })
 
 
+/*
+Fonts
+*/
+// const fontLoader = new FontLoader()
+
+// fontLoader.load(
+//     '/fonts/helvetiker_regular.typeface.json',
+//     (font) =>  {
+//        const textGeomtry = new TextGeometry(
+//         "Richard Browne",
+//         {
+//             font: font,
+//             size: 0.5,
+//             height: 0.2,
+//             curveSegments: 5,
+//             bevelEnabled: true,
+//             bevelThickness: 0.03,
+//             bevelOffset: 0,
+//             bevelSegments: 4,
+//         }
+//        );
+//     //    textGeomtry.computeBoundingBox();
+//     //    textGeomtry.translate(
+//     //        - textGeomtry.boundingBox.max.x * 0.5
+//     //        - textGeomtry.boundingBox.max.y * 0.5
+//     //        - textGeomtry.boundingBox.max.z * 0.5
+//     //        )
+//     textGeomtry.center();
+
+//        const textMaterial = new THREE.MeshBasicMaterial()
+//        const text = THREE.Mesh(textGeomtry, textMaterial);
+//        scene.add(text);
+
+//        for (let i = 0; i < 100; i++) {
+//         const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
+//         const donutMaterial = new THREE.MeshNormalMaterial();
+//         donutMaterial.normalMap = colorTexture;
+//         const donut = new THREE.Mesh(donutGeometry, donutMaterial);
+//         donut.position.x = (Math.random() - 0.5) * 10;
+//         donut.position.y = (Math.random() - 0.5) * 10;
+//         donut.position.z = (Math.random() - 0.5) * 10;
+        
+//         scene.add(donut);
+//        }
+//     }
+// )
+
 /* 
 Textures
 */
@@ -136,7 +188,7 @@ colorTexture.minFilter = THREE.LinearFilter
 //     // console.log('Image loading')
 //     texture.needsUpdate = true
 //     console.log(texture)
-// }
+// } 
 
 // image.src = 'static/textures/wood_floor_deck_diff_4k.jpg'
 
@@ -145,14 +197,31 @@ colorTexture.minFilter = THREE.LinearFilter
 /**
  * Object
  */
+
+const donutGeometry = new THREE.TorusGeometry(0.3, 0.3, 20, 20);
+const donutMaterial = new THREE.MeshNormalMaterial();
+
+for (let i = 0; i < 100; i++) {
+    donutMaterial.normalMap = colorTexture;
+    const donut = new THREE.Mesh(donutGeometry, donutMaterial);
+    donut.position.x = (Math.random() - 0.5) * 10;
+    donut.position.y = (Math.random() - 0.5) * 10;
+    donut.position.z = (Math.random() - 0.5) * 10;
+    donut.rotation.x = Math.random() * Math.PI
+    donut.rotation.y = Math.random() - 0.5 * Math.PI
+    
+    scene.add(donut);
+}
 // const geometry = new THREE.SphereGeometry(1, 32, 32)
 // const geometry = new THREE.TorusGeometry(1, 0.32, 32, 100)
 // const geometry = new THREE.SphereGeometry(1, 32, 32)
 
 
 // const material = new THREE.MeshStandardMaterial({ color: parameters.color })
-const material = new THREE.MeshNormalMaterial({ map: colorTexture })
+const material = new THREE.MeshNormalMaterial()
 material.flatShading = true
+material.displacementScale = 0.01
+material.normalMap = colorTexture
 
 const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(1, 32, 32),
@@ -240,8 +309,8 @@ controls.maxPolarAngle = Math.PI / 2;
 
 
 //Axes helper
-// const axesHelper = new THREE.AxesHelper(10);
-// scene.add(axesHelper);
+const axesHelper = new THREE.AxesHelper();
+scene.add(axesHelper);
  
 // Rotations
 // mesh.rotation.reorder('XYZ')
